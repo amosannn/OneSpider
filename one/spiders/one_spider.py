@@ -12,7 +12,7 @@ class OneSpider(Spider):
     }
 
     def start_requests(self):
-        for i in range(14, 1930):
+        for i in range(14, 19):
             url = self.base_url + str(i)
             yield Request(url, headers=self.headers)
 
