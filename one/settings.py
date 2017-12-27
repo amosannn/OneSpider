@@ -63,9 +63,9 @@ CONCURRENT_REQUESTS_PER_DOMAIN = 16
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
-# ITEM_PIPELINES = {
-#    'one.pipelines.ScrapyspiderPipeline': 300,
-# }
+ITEM_PIPELINES = {
+    'one.pipelines.QuotePipeline': 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
@@ -94,6 +94,3 @@ MYSQL_DBNAME = 'one'
 MYSQL_USER = 'root'
 MYSQL_PASSWD = '123456'
 MYSQL_PORT = 3306
-ITEM_PIPELINES = {
-    'one.pipelines.ScrapyspiderPipeline': 300,
-}

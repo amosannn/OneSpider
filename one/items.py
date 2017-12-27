@@ -25,3 +25,20 @@ class OneQuoteItem(scrapy.Item):
     quote = scrapy.Field()
     # 日期
     publishedDate = scrapy.Field()
+
+
+class OneArticleItem(scrapy.Item):
+    # 网址后缀
+    pageId = scrapy.Field()
+    # 来源url
+    url = scrapy.Field()
+    # 标题
+    title = scrapy.Field()
+    # 作者
+    author = scrapy.Field()
+    # 编辑
+    editor = scrapy.Field()
+    # 摘要
+    description = scrapy.Field()
+    # 正文
+    article = scrapy.Field()
