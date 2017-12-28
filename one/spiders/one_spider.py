@@ -10,6 +10,20 @@ import re
 
 
 class QuoteSpider(Spider):
+    """ 「ONE · 一个」 每日一句、每日一图爬虫
+
+    每日一句： 爬取的内容有期号、句子、发布日期
+    每日一图： 爬取的内容有图片url、图片分类
+
+    Attributes:
+        name: 爬虫名，不可重复
+        base_url: 目标网址头
+        url: 目标网址
+        item: 映射 one.items.py
+        infos: xpath提取的页面元素（未处理）
+        info: 根据各个item字段提取各自元素
+    """
+
     name = 'one_quote'
     base_url = 'http://wufazhuce.com/one/'
     headers = {
@@ -46,6 +60,21 @@ class QuoteSpider(Spider):
 
 
 class ArticleSpider(Spider):
+    """ 「ONE · 一个」 每日一文爬虫
+
+    每日一文： 爬取的内容有页面地址、页面id、文章标题、作者、编辑、摘要、正文
+        正文使用了正则剥离外层<div>标签对
+        获得的内容包含换行符(<br>)，如需去除可自行处理
+
+    Attributes:
+        name: 爬虫名，不可重复
+        base_url: 目标网址头
+        url: 目标网址
+        item: 映射 one.items.py
+        infos: xpath提取的页面元素（未处理）
+        info: 根据各个item字段提取各自元素
+    """
+
     name = 'one_article'
     base_url = 'http://wufazhuce.com/article/'
     headers = {
@@ -82,6 +111,19 @@ class ArticleSpider(Spider):
 
 
 class QuestionSpider(Spider):
+    """ 「ONE · 一个」 每日一问爬虫
+
+    每日一问： 爬取的内容有页面地址、页面id、问题、问题简述、回答者、问答详情
+
+    Attributes:
+        name: 爬虫名，不可重复
+        base_url: 目标网址头
+        url: 目标网址
+        item: 映射 one.items.py
+        infos: xpath提取的页面元素（未处理）
+        info: 根据各个item字段提取各自元素
+    """
+
     name = 'one_question'
     base_url = 'http://wufazhuce.com/question/'
     headers = {
