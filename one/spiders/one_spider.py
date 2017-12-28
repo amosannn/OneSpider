@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 from scrapy import Request
 from scrapy.spiders import Spider
 
 from one.items import OneQuoteItem
 from one.items import OneArticleItem
+import re
 
 
 class QuoteSpider(Spider):
@@ -50,26 +52,29 @@ class ArticleSpider(Spider):
 
     def start_requests(self):
         # for i in range(9, 2998):
-        for i in range(23, 25):
+        for i in range(33, 35):
             url = self.base_url + str(i)
-            yield Request(url, headers=self.headers, callback=self.parse, meta={'url':url, 'sufNum':str(i)})
+            yield Request(url, headers=self.headers, callback=self.parse, meta={'url': url, 'sufNum': str(i)})
 
     def parse(self, response):
         item = OneArticleItem()
-        infos=response.xpath('//div[@class="one-articulo"]')
+        infos = response.xpath('//div[@class="one-articulo"]')
         for info in infos:
-            item['pageId']=response.meta['sufNum']
-            item['url']=response.meta['url']
-            item['title']=info.xpath('.//h2[@class="articulo-titulo"]/text()').extract()[0].strip()
-            item['author']=info.xpath('.//p[@class="articulo-autor"]/text()').extract()[0].strip()
-            item['editor']=info.xpath('.//p[@class="articulo-editor"]/text()').extract()[0].strip()
-            item['description']=info.xpath('.//div[@class="comilla-abrir"]/div[@class="comilla-cerrar"]/text()').extract()[0].strip()
+            item['pageId'] = response.meta['sufNum']
+            item['url'] = response.meta['url']
+            item['title'] = info.xpath('.//h2[@class="articulo-titulo"]/text()').extract()[0].strip()
+            item['author'] = info.xpath('.//p[@class="articulo-autor"]/text()').extract()[0].split('/', 1)[1].strip()
+            item['editor'] = info.xpath('.//p[@class="articulo-editor"]/text()').extract()[0].strip()
+            item['description'] = \
+                info.xpath('.//div[@class="comilla-abrir"]/div[@class="comilla-cerrar"]/text()').extract()[0].strip()
 
-            # article = info.xpath('.//div[@class="articulo-contenido"]/descendant::text()').extract()[0].strip()
-            # lst = info.xpath('.//div[@class="articulo-contenido"]/br')
-            # for ll in lst:
-            #     article += ll.tail
-            # item['article']=article
-            item['article'] = info.xpath('.//div[@class="articulo-contenido"]/following::text()').extract()[0].strip()
+            # 提取未处理文章（包含html标签）
+            # 匹配html标签正则 </?\w+[^>]*>
+            raw_article = info.xpath('.//div[@class="articulo-contenido"]').extract()[0].strip()
+            # 去除div标签（外壳）
+            re_div = re.compile('</?div\s*[^<]*>')
+            article = re_div.sub('', raw_article)
+            item['article'] = article
 
         yield item
+
