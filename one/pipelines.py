@@ -32,12 +32,16 @@ class QuotePipeline(object):
 
     def process_item(self, item, spider):
         asynItem = copy.deepcopy(item)
-        if(spider.name) == 'one_quote':
+        if (spider.name) == 'one_quote':
             query = self.dbpool.runInteraction(self._conditional_insert, asynItem)  # 调用插入的方法 Interaction(中文是交互)
             query.addErrback(self._handle_error, asynItem, spider)  # 调用异常处理方法
             return asynItem
-        if(spider.name)=='one_article':
+        if (spider.name) == 'one_article':
             query = self.dbpool.runInteraction(self._article_insert, asynItem)  # 调用插入的方法 Interaction(中文是交互)
+            query.addErrback(self._handle_error, asynItem, spider)  # 调用异常处理方法
+            return asynItem
+        if (spider.name) == 'one_question':
+            query = self.dbpool.runInteraction(self._question_insert, asynItem)  # 调用插入的方法 Interaction(中文是交互)
             query.addErrback(self._handle_error, asynItem, spider)  # 调用异常处理方法
             return asynItem
 
@@ -47,8 +51,16 @@ class QuotePipeline(object):
         tx.execute(sql, params)
 
     def _article_insert(self, tx, item):
-        sql="INSERT INTO `one`.`one_article_test` (`id`, `page_id`, `url`, `title`, `author`, `editor`, `description`, `article`) VALUES (null, %s, %s, %s, %s, %s, %s, %s)"
-        params = (item["pageId"], item["url"], item["title"], item["author"], item["editor"], item["description"], item["article"])
+        sql = "INSERT INTO `one`.`one_article_test` (`id`, `page_id`, `url`, `title`, `author`, `editor`, `description`, `article`) VALUES (null, %s, %s, %s, %s, %s, %s, %s)"
+        params = (item["pageId"], item["url"], item["title"], item["author"], item["editor"], item["description"],
+                  item["article"])
+        tx.execute(sql, params)
+
+    def _question_insert(self, tx, item):
+        sql = "INSERT INTO `one`.`one_question` (`id`, `page_id`, `url`, `question`, `question_content`, `answer`, `answer_content`) VALUES (null, %s, %s, %s, %s, %s, %s);"
+        params = (
+            item["pageId"], item["url"], item["question"], item["questionContent"], item["answer"],
+            item["answerContent"])
         tx.execute(sql, params)
 
     def _handle_error(self, failue, item, spider):

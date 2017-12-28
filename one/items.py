@@ -42,3 +42,18 @@ class OneArticleItem(scrapy.Item):
     description = scrapy.Field()
     # 正文
     article = scrapy.Field()
+
+
+class OneQuestionItem(scrapy.Item):
+    #网址后缀
+    pageId= scrapy.Field()
+    #url
+    url=scrapy.Field()
+    #问题
+    question=scrapy.Field()
+    #问题内容
+    questionContent=scrapy.Field()
+    #回答
+    answer=scrapy.Field()
+    #回答内容
+    answerContent=scrapy.Field()

@@ -4,6 +4,8 @@ from scrapy.spiders import Spider
 
 from one.items import OneQuoteItem
 from one.items import OneArticleItem
+from one.items import OneQuestionItem
+
 import re
 
 
@@ -70,11 +72,41 @@ class ArticleSpider(Spider):
 
             # 提取未处理文章（包含html标签）
             # 匹配html标签正则 </?\w+[^>]*>
-            raw_article = info.xpath('.//div[@class="articulo-contenido"]').extract()[0].strip()
+            raw_article = info.xpath('.//div[@class="articulo-contenido"]').extract()[0]
             # 去除div标签（外壳）
             re_div = re.compile('</?div\s*[^<]*>')
             article = re_div.sub('', raw_article)
-            item['article'] = article
+            item['article'] = article.strip()
 
         yield item
 
+
+class QuestionSpider(Spider):
+    name = 'one_question'
+    base_url = 'http://wufazhuce.com/question/'
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36'
+    }
+
+    def start_requests(self):
+        for i in range(8, 30):
+            url = self.base_url + str(i)
+            yield Request(url, headers=self.headers, callback=self.parse, meta={'url': url, 'pageId': str(i)})
+
+    def parse(self, response):
+        item = OneQuestionItem()
+        infos = response.xpath('//div[@class="one-cuestion"]')
+        for info in infos:
+            item['pageId'] = response.meta['pageId']
+            item['url'] = response.meta['url']
+            item['question'] = info.xpath('.//h4[1]/text()').extract()[0].strip()
+            item['questionContent'] = info.xpath('.//div[2]/text()').extract()[0].strip()
+            item['answer'] = info.xpath('.//h4[2]/text()').extract()[0].strip()
+
+            # 去除div标签
+            raw_answer = info.xpath('.//div[4]').extract()[0]
+            re_div = re.compile('</?div\s*[^<]*>')
+            answer = re_div.sub('', raw_answer)
+            item['answerContent'] = answer.strip()
+
+        yield item
